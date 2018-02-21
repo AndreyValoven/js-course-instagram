@@ -1,0 +1,8 @@
+{
+    "name": "JS Course Instagram",
+    "description": "",
+    "repository": "https://github.com/AndyScorp/js-course-instagram.git",
+    "logo": "",
+    "keywords": ["node", "express", "heroku"],
+    "image": "heroku/nodejs"
+  }

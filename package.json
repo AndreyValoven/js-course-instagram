@@ -1,0 +1,33 @@
+{
+  "name": "instagram",
+  "version": "0.0.0",
+  "description": "",
+  "engines": {
+    "node": "8.9.4"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server",
+    "test": "node --inspect-brk server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndyScorp/js-course-instagram.git"
+  },
+  "keywords": [
+    "node",
+    "express"
+  ],
+  "author": "Andrey Valoven",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndyScorp/js-course-instagram/issues"
+  },
+  "homepage": "https://github.com/AndyScorp/js-course-instagram#readme",
+  "devDependencies": {
+    "nodemon": "^1.15.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
