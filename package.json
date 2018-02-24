@@ -5,10 +5,18 @@
   "engines": {
     "node": "8.9.4"
   },
+  "lint-staged": {
+    "*.js": [
+      "eslint --config .eslintrc.js",
+      "git add"
+    ]
+  },
   "main": "server.js",
   "scripts": {
     "start": "nodemon server",
-    "test": "node --inspect-brk server.js"
+    "test": "node --inspect-brk server.js",
+    "precommit": "lint-staged",
+    "run": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -25,9 +33,13 @@
   },
   "homepage": "https://github.com/AndyScorp/js-course-instagram#readme",
   "devDependencies": {
+    "eslint": "^4.18.1",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.0.0",
     "nodemon": "^1.15.1"
   },
   "dependencies": {
+    "eslint-config-recommended": "^2.0.0",
     "express": "^4.16.2"
   }
 }
