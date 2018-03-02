@@ -22,7 +22,7 @@ module.exports = {
         'no-unused-vars': ['error', { vars: 'local' }],
 
         // override default options for rules from base configurations
-        "comma-dangle": ["error", "always"],
+        // "comma-dangle": ["error", "always"],
         'no-cond-assign': ['error', 'always'],
         // eqeqeq: ['error', 'smart'],
 
