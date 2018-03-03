@@ -24,7 +24,7 @@ module.exports = {
         // override default options for rules from base configurations
         // "comma-dangle": ["error", "always"],
         'no-cond-assign': ['error', 'always'],
-        // eqeqeq: ['error', 'smart'],
+        eqeqeq: ['error', 'smart'],
 
         // disable rules from base configurations
         "no-console": "off",
@@ -33,6 +33,7 @@ module.exports = {
         'no-loop-func': 'error',
         'no-self-compare': 'error',
         // 'no-use-before-define': 'error',
-        'no-unneeded-ternary': 'error'
+        'no-unneeded-ternary': 'error',
+        'no-useless-escape': 'off'
     }
 };
