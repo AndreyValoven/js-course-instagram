@@ -11,8 +11,8 @@ let api = express.Router();
 
 api.use('/registration', registration);
 api.use('/authoriztion', authoriztion);
-api.use('/email', email);
-api.use('/nick_name', nickName);
+api.use('/check/email', email);
+api.use('/check/nick_name', nickName);
 
 
 api.use('/user',varyfiToken, (req, res) => {
