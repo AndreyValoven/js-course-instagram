@@ -5,7 +5,7 @@ const nickName = express.Router();
 
 nickName.get('/:nick', (req, res) => {
     let nick = req.params.nick;
-    if (nick.length >= 3 && nick.length <= 30) {
+    if (nick.length >= 4 && nick.length <= 30) {
         User.findOne({ nick_name: nick })
             .then(result => {
                 console.log(result);
