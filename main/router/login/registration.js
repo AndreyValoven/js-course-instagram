@@ -17,9 +17,13 @@ function checkValues(body) {
         body.nick_name.replace(/ /, '') === '' ||
         body.email.replace(/ /, '') === '' ||
         body.pwd.replace(/ /, '') === '' ||
-        valideteEmail(body.email)
-    ) return true;
-    return false;
+        !valideteEmail(body.email)
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
 registration.post('/', (req, res) => {
