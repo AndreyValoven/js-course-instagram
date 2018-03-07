@@ -26,35 +26,77 @@ function checkValues(body) {
 
 }
 
-registration.post('/', (req, res) => {
-    const body = req.body;
-    if(checkValues(body)) {
-        return res.status(500).json({
-            error: 'empty values or not corect email'
+registration.post('/',
+    (req, res, next) => {
+        const body = req.body;
+        if(checkValues(body)) {
+            res.status(500).json({
+                error: 'empty values or not corect email'
+            });
+        } else {
+            next();
+        }
+    },
+    (req, res, next) => {
+        const body = req.body;
+        User.find({ email: body.email })
+            .then(user => {
+                if(typeof user !== 'undefined' && user.length > 0) {
+                    res.status(500).json({
+                        mes: 'email is not free'
+                    });
+                } else {
+                    next();
+                }
+            })
+            .catch(error => {
+                res.status(500).json({
+                    mes: error
+                });
+            });
+    },
+    (req, res, next) => {
+        const body = req.body;
+        User.find({ nick_name: body.nick_name })
+            .then(user => {
+                if(typeof user !== 'undefined' && user.length > 0) {
+                    res.status(500).json({
+                        mes: 'nick name is not free'
+                    });
+                } else {
+                    next();
+                }
+            })
+            .catch(error => {
+                res.status(500).json({
+                    mes: error
+                });
+            });
+    },
+    (req, res) => {
+        const body = req.body;
+        let user = new User({
+            _id: mongoose.Types.ObjectId(),
+            name: body.name,
+            nick_name: body.nick_name,
+            email: body.email,
+            pwd: body.pwd,
+            followers: [],
+            following: [],
+            avatar: ''
         });
-    }
-    let user = new User({
-        _id: mongoose.Types.ObjectId(),
-        name: body.name,
-        nick_name: body.nick_name,
-        email: body.email,
-        pwd: body.pwd,
-        followers: [],
-        following: [],
-        avatar: ''
-    });
 
-    user.save()
-        .then(result => {
-            let token = jwt.sign({ user: result ,}, 'secret');
-            res.type('json');
-            res.status(200).json({token});
-        })
-        .catch(error => {
-            console.error(error);
-            res.sendStatus(500);
-        });
-});
+        user.save()
+            .then(result => {
+                let token = jwt.sign({ user: result ,}, 'secret');
+                res.type('json');
+                res.status(200).json({token});
+            })
+            .catch(error => {
+                console.error(error);
+                res.sendStatus(500);
+            });
+    });
 
 
 
