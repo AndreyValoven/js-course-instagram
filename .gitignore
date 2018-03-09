@@ -1,2 +1,4 @@
 package-lock.json
 nodemon.json
+node_modules
+.vscode
