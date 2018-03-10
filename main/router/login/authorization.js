@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const User = require('./../../models/user');
 const valideteEmail = require('./../../functions/validate_email');
@@ -24,19 +25,21 @@ authoriztion.post('/',
         }
     },
     (req, res) => {
-        console.log(req.body);
         const body = req.body;
         User.findOne({ email: body.email })
             .then(user => {
-                if(user == null || user.pwd !== body.pwd) {
-                    res.status(404).json({
-                        mes: 'wrong pasword or email'
+                bcrypt.hash(body.pwd, user.pwd)
+                    .then(hash => {
+                        if(user == null || hash !== user.pwd) {
+                            res.status(404).json({
+                                mes: 'wrong pasword or email'
+                            });
+                        } else {
+                            let token = jwt.sign({ user: user ,}, 'secret');
+                            res.type('json');
+                            res.status(200).json({token});
+                        }
                     });
-                } else {
-                    let token = jwt.sign({ user: user ,}, 'secret');
-                    res.type('json');
-                    res.status(200).json({token});
-                }
             })
             .catch(error => {
                 res.status(504).json({

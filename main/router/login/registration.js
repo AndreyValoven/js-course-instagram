@@ -1,6 +1,7 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const saveUser = require('./../../database/createUser');
 
 const valideteEmail = require('./../../functions/validate_email');
 const User = require('./../../models/user');
@@ -69,24 +70,15 @@ registration.post('/',
             })
             .catch(error => {
                 res.status(500).json({
-                    mes: error
+                    error: error
                 });
             });
     },
     (req, res) => {
         const body = req.body;
-        let user = new User({
-            _id: mongoose.Types.ObjectId(),
-            name: body.name,
-            nick_name: body.nick_name,
-            email: body.email,
-            pwd: body.pwd,
-            followers: [],
-            following: [],
-            avatar: ''
-        });
+        body.pwd = bcrypt.hashSync(body.pwd, 10);
 
-        user.save()
+        saveUser(body)
             .then(result => {
                 let token = jwt.sign({ user: result ,}, 'secret');
                 res.type('json');
@@ -94,7 +86,9 @@ registration.post('/',
             })
             .catch(error => {
                 console.error(error);
-                res.sendStatus(500);
+                res.status(500).json({
+                    error
+                });
             });
     });
 
