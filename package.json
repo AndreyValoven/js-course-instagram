@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "engines": {
-    "node": "8.9.4"
+    "node": "8.10.0"
   },
   "lint-staged": {
     "*.js": [
@@ -40,6 +40,7 @@
     "nodemon": "^1.15.1"
   },
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.1",
