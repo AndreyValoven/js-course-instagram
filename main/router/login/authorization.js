@@ -1,11 +1,8 @@
-const express = require('express');
+const authoriztion = require('express').Router();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 const User = require('./../../models/user');
 const valideteEmail = require('./../../functions/validate_email');
-
-const authoriztion = express.Router();
 
 authoriztion.post('/',
     (req, res, next) => {
@@ -28,14 +25,29 @@ authoriztion.post('/',
         const body = req.body;
         User.findOne({ email: body.email })
             .then(user => {
-                if(user == null || !bcrypt.compareSync(body.pwd, user.pwd)) {
+                if(user == null) {
                     res.status(404).json({
-                        mes: 'wrong pasword or email'
+                        mes: 'empy request'
                     });
                 } else {
-                    let token = jwt.sign({ user: user ,}, 'secret');
-                    res.type('json');
-                    res.status(200).json({token});
+                    user.comparePwd(body.pwd, function(err, isMatch) {
+                        if (err) {
+                            return res.status(404).jons({
+                                err
+                            });
+                        }
+                        let token = jwt.sign({ id: user._id, nick_name: user.nick_name }, process.env.SECRET_KEY);
+                        res.type('json');
+                        res.status(200).json({
+                            token,
+                            user: {
+                                _id: user._id,
+                                nick_name: user.nick_name
+                            }
+                        });
+                        console.log(body.pwd, isMatch);
+                    });
+
                 }
 
             })

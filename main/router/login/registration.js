@@ -1,12 +1,9 @@
-const express = require('express');
+const registration = require('express').Router();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const saveUser = require('./../../database/createUser');
 
 const valideteEmail = require('./../../functions/validate_email');
 const User = require('./../../models/user');
-
-const registration = express.Router();
 
 function checkValues(body) {
     if (
@@ -76,13 +73,18 @@ registration.post('/',
     },
     (req, res) => {
         const body = req.body;
-        body.pwd = bcrypt.hashSync(body.pwd, 10);
 
         saveUser(body)
             .then(result => {
-                let token = jwt.sign({ user: result ,}, 'secret');
+                let token = jwt.sign({ user: {id: result._id, nick_name: result.nick_name} ,}, process.env.SECRET_KEY);
                 res.type('json');
-                res.status(200).json({token});
+                res.status(200).json({
+                    token,
+                    result: {
+                        _id: result._id,
+                        nick_name: result.nick_name
+                    }
+                });
             })
             .catch(error => {
                 console.error(error);
