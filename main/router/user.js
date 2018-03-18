@@ -13,7 +13,6 @@ user.get('/:id', varyfiToken,(req, res) => {
             if ( user != null ) {
                 if (typeof req.id === 'object' && req.id !== user._id ) {
                     let followerUser = false;
-                    console.log(req.id);
                     for (const tokenId of user.followers) {
                         tokenId.toString() === req.id.toString() ? followerUser = true : followerUser;
                     }
@@ -42,7 +41,6 @@ user.get('/:id', varyfiToken,(req, res) => {
             }
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({
                 error: err
             });

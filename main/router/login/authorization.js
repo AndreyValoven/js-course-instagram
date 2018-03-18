@@ -31,9 +31,9 @@ authoriztion.post('/',
                     });
                 } else {
                     user.comparePwd(body.pwd, function(err, isMatch) {
-                        if (err) {
-                            return res.status(404).jons({
-                                err
+                        if (!isMatch) {
+                            return res.status(404).json({
+                                error: "wrong password"
                             });
                         }
                         let token = jwt.sign({ id: user._id, nick_name: user.nick_name }, process.env.SECRET_KEY);
@@ -45,7 +45,6 @@ authoriztion.post('/',
                                 nick_name: user.nick_name
                             }
                         });
-                        console.log(body.pwd, isMatch);
                     });
 
                 }

@@ -7,7 +7,6 @@ module.exports = (req, res, next) => {
         const tokenArr = headerToken.split(' ');
         const tokenKey = tokenArr[1];
         let user = jwt.verify(tokenKey, process.env.SECRET_KEY);
-        console.info(user);
         User.findOne({ _id: user.id })
             .then(user => {
                 if ( user._id != null ) {
