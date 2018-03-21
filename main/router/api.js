@@ -6,7 +6,7 @@ const email = require('./check/email');
 const nickName = require('./check/nick_name');
 
 api.use('/registration', registration);
-api.use('/authoriztion', authoriztion);
+api.use('/authorization', authoriztion);
 api.use('/check/email', email);
 api.use('/check/nick_name', nickName);
 
