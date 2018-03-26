@@ -1,28 +1,11 @@
 const registration = require('express').Router();
 const jwt = require('jsonwebtoken');
+
+
 const saveUser = require('./../../database/createUser');
-
-const valideteEmail = require('./../../functions/validate_email');
 const User = require('./../../models/user');
+const checkValues = require('./../../functions/check_values');
 
-function checkValues(body) {
-    if (
-        typeof body.name === 'undefined' ||
-        typeof body.nick_name === 'undefined' ||
-        typeof body.email === 'undefined' ||
-        typeof body.pwd === 'undefined' ||
-        body.name.replace(/ /, '') === '' ||
-        body.nick_name.replace(/ /, '') === '' ||
-        body.email.replace(/ /, '') === '' ||
-        body.pwd.replace(/ /, '') === '' ||
-        !valideteEmail(body.email)
-    ) {
-        return true;
-    } else {
-        return false;
-    }
-
-}
 
 registration.post('/',
     (req, res, next) => {
