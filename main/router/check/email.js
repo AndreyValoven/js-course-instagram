@@ -8,9 +8,8 @@ email.get('/:email', (req, res) => {
     let email = req.params.email;
     if (validateEmail(email)) {
         User.findOne({ email: email })
-            .then(result => {
-                console.log(resut);
-                if (result == null) {
+            .then(user => {
+                if (user == null) {
                     res.status(200).json({
                         free: true
                     });
