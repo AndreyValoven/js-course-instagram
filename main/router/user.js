@@ -50,7 +50,7 @@ user.get('/:id', varyfiToken,(req, res) => {
 
 
 user.patch('/:id', varyfiToken,
-    (req, res) => {
+    (req, res, next) => {
         const body = req.body;
         const id = req.params.id;
         if (req.id + '' !== id+ '') {
@@ -68,6 +68,11 @@ user.patch('/:id', varyfiToken,
                 error: 'empty values or not corect email'
             });
         }
+        next();
+    },
+    (req,res) => {
+        const body = req.body;
+        const id = req.params.id;
         // check if exists uaser
         User.findById( id,
             function(error, user) {
