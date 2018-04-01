@@ -9,7 +9,7 @@ email.get('/:email', (req, res) => {
     if (validateEmail(email)) {
         User.findOne({ email: email })
             .then(result => {
-                console.log(resut);
+                console.log(result);
                 if (result == null) {
                     res.status(200).json({
                         free: true
