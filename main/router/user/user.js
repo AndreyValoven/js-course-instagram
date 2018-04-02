@@ -1,10 +1,34 @@
 const user = require('express').Router();
-const varyfiToken = require('./../functions/verify_token');
-// const jwt = require('jsonwebtoken');
+const varyfiToken = require('./../../functions/verify_token');
 
-const checkValues = require('./../functions/check_values');
-const User = require('./../models/user');
-// const varyfiToken = require('./../functions/verufi_token');
+
+const checkValues = require('./../../functions/check_values');
+const User = require('./../../models/user');
+
+user.use('/:id/following', require('./following'));
+
+
+user.use('/:id/followers', (req, res) => {
+    let url = req.originalUrl.split('/');
+    const id = url[3];
+    User.findById(id, (error, user) => {
+        User.find( {
+            _id: {
+                $in: user.followers
+            }
+        }, (error, users) => {
+            if (error) return res.status(500).json({ error });
+            users = users.map(item => {
+                return {
+                    id: item._id,
+                    nick_name: item.nick_name,
+                    avatar: item.avatar
+                };
+            });
+            res.json(users);
+        });
+    });
+});
 
 user.get('/:id', varyfiToken,(req, res) => {
     // check if exists user in db
@@ -49,6 +73,21 @@ user.get('/:id', varyfiToken,(req, res) => {
 });
 
 
+user.delete('/:id', varyfiToken,
+    (req, res) => {
+        console.log(req.id + '',req.params.id+ '');
+        if (req.id + '' !== req.params.id+ '') {
+            return res.status(403).json({ erorr: 'Forbidden'});
+        }
+        User.findByIdAndRemove(req.id ,(error, user) => {
+            if(error)
+                return res.json({ error });
+            res.json({
+                user
+            });
+        });
+    });
+
 user.patch('/:id', varyfiToken,
     (req, res, next) => {
         const body = req.body;
@@ -73,31 +112,26 @@ user.patch('/:id', varyfiToken,
     (req,res) => {
         const body = req.body;
         const id = req.params.id;
+        body.pwd = bcrypt.hashSync(body.pwd, process.env.SALT_WORK_FACTOR);
         // check if exists uaser
-        User.findById( id,
+        User.findByIdAndUpdate( id,
+            {
+                $set: {
+                    pwd: body.pwd
+                }
+            },
+            { new: true },
+
             function(error, user) {
                 if (error) {
                     return res.status(501).json({
                         error
                     });
                 }
-                user.name = body.name;
-                user.nick_name = body.nick_name;
-                user.email = body.email;
-                user.pwd = body.pwd;
-                user.save()
-                    .then(user => {
-                        console.log(user);
-                        res.status(202).json({
-                            user,
-                        });
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        res.status(500).json({
-                            error
-                        });
-                    });
+                console.log(user);
+                res.status(202).json({
+                    user,
+                });
             });
     });
 
