@@ -117,7 +117,10 @@ user.patch('/:id', varyfiToken,
         User.findByIdAndUpdate( id,
             {
                 $set: {
-                    pwd: body.pwd
+                    pwd: body.pwd,
+                    name: body.name,
+                    nick_name: body.nick_name,
+                    email: body.email
                 }
             },
             { new: true },
