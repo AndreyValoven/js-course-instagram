@@ -2,7 +2,7 @@ const user = require('express').Router();
 const varyfiToken = require('./../../functions/verify_token');
 
 // const checkValues = require('./../functions/check_values');
-const User = require('./../models/user');
+const User = require('./../../models/user');
 // const varyfiToken = require('./../functions/verufi_token');
 
 user.get('/:id', varyfiToken,(req, res) => {
