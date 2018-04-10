@@ -11,7 +11,7 @@ api.use('/check/email', email);
 api.use('/check/nick_name', nickName);
 
 
-api.use('/user', require('./user'));
+api.use('/user', require('./user/user'));
 
 
 module.exports = api;
