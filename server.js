@@ -1,12 +1,12 @@
-let express = require('express');
-let mongoose = require('mongoose');
-let bodyParser = require('body-parser');
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 mongoose.connect(`mongodb://${process.env.MONGO_USER}:${process.env.MONGO_USER_PWD}@js-course-instagram-shard-00-00-l5lfy.mongodb.net:27017,js-course-instagram-shard-00-01-l5lfy.mongodb.net:27017,js-course-instagram-shard-00-02-l5lfy.mongodb.net:27017/test2?ssl=true&replicaSet=js-course-instagram-shard-0&authSource=admin`);
 
-let app = express();
+const app = express();
 const PORT = process.env.PORT || 3000;
-let db = mongoose.connection;
+const db = mongoose.connection;
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
