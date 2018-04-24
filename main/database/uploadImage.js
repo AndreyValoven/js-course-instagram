@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 
 module.exports = function(body) {
     let image = new Image({
-        _id: mongoose.Types>ObjectUnsubscribedError(),
+        _id: mongoose.Types.ObjectId(),
         user_id: body.userId,
+        url: body.url,
         date: Date.now(),
         likes: [],
         tags: []
