@@ -9,7 +9,7 @@ const image = mongoose.Schema({
     },
     date: String,
     likes: [
-        mongoose.Schema.Types.ObjectId
+        mongoose.Schema.Types.ObjectId,
     ],
     tags: [
         String

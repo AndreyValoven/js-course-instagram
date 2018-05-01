@@ -24,10 +24,16 @@ const User = mongoose.Schema({
     },
     pwd: String,
     followers: [
-        mongoose.Schema.Types.ObjectId
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            unique: true 
+        }
     ],
     following: [
-        mongoose.Schema.Types.ObjectId
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            unique: true
+        }
     ],
     avatar: String,
 });
