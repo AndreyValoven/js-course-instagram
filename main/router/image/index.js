@@ -24,7 +24,19 @@ image.get('/:id', varyfiToken,
         });
     });
 
-// todo write script for creating new image
+image.delete('/:id', varyfiToken, (req, res) => {
+    if (typeof(req.id) === 'undefined') {
+        return res.status(403).json({ erorr: 'Forbidden'});
+    }
+    let id = req.params.id;
+    Image.findById(id, (error, image) => {
+        if (error) return res.status(500).json({ error });
+        if (req.id + '' !== image.user_id + '') return res.status(403).jons({ erorr: 'Forbidden' });
+
+    });
+});
+
+
 image.post('/upload', varyfiToken,
     (req, res) => {
         if (typeof(req.id) === 'undefined') {
@@ -60,8 +72,6 @@ image.post('/upload', varyfiToken,
                     .catch(error => {
                         return res.status(500).json({ error });
                     });
-                // console.log("Object is public at https://s3.amazonaws.com/" +
-                // s3Params.Bucket + "/" + s3Params.Key);
             });
         });
 
