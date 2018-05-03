@@ -4,6 +4,7 @@ const image = require('express').Router();
 const s3 = require('./../../image_config/s3');
 const upload = require('./../../image_config/upload');
 const Image = require('./../../models/image');
+const User = require('./../../models/user');
 const varyfiToken = require('./../../functions/verify_token');
 const saveImage = require('./../../database/uploadImage');
 
@@ -14,12 +15,18 @@ image.get('/:id', varyfiToken,
         const id = req.params.id;
         Image.findById(id, (error, image) => {
             if (error) return res.status(500).json({ error });
-            req.json({
-                user_id: image.user_id,
-                url: image.url,
-                date: image.date,
-                tags: image.tags,
-                likes: image.likes.legth
+            User.findById(image.user_id, (err, user) => {
+                if (err) return res.json({ error: err});
+                res.json({
+                    user_id: image.user_id,
+                    nick_name: user.nick_name,
+                    avatar: user.avatar,
+                    url: image.url,
+                    date: image.date,
+                    tags: image.tags,
+                    your_like: false,
+                    likes: image.likes.legth
+                });
             });
         });
     });
@@ -46,7 +53,6 @@ image.post('/upload', varyfiToken,
             if (error) return res.status(500).json({ error });
             let fileType = req.file.mimetype.split('/');
             fileType = fileType[1];
-            console.log(fileType);
             let fileName = req.id + '-' + Date.now() + '.' + fileType;
 
             const s3Params = {
@@ -66,8 +72,13 @@ image.post('/upload', varyfiToken,
                     userId: req.id
                 })
                     .then(image => {
-                        console.log(image);
-                        return res.json({ image });
+                        return res.json({
+                            id: image._id,
+                            user_id: image.user_id,
+                            url: image.url,
+                            likes: image.likes,
+                            tags: image.tags
+                        });
                     })
                     .catch(error => {
                         return res.status(500).json({ error });
