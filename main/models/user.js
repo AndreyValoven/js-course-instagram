@@ -23,18 +23,8 @@ const User = mongoose.Schema({
         required: [true, 'User email required']
     },
     pwd: String,
-    followers: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            unique: true 
-        }
-    ],
-    following: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            unique: true
-        }
-    ],
+    followers: [ mongoose.Schema.Types.ObjectId ],
+    following: [ mongoose.Schema.Types.ObjectId ],
     avatar: String,
 });
 
