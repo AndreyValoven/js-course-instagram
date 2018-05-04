@@ -76,6 +76,7 @@ image.post('/upload', varyfiToken,
                             id: image._id,
                             user_id: image.user_id,
                             url: image.url,
+                            file_name: fileName,
                             likes: image.likes,
                             tags: image.tags
                         });
@@ -85,8 +86,47 @@ image.post('/upload', varyfiToken,
                     });
             });
         });
-
     }
 );
+
+// need to test
+image.delete('/:id', varyfiToken,
+    (req, res)=>{
+        if (typeof(req.id) === 'undefined') {
+            return res.status(403).json({ erorr: 'Forbidden'});
+        }
+        Image.findById(req.params.id, (error, image) => {
+            if (error) return res.status(500).json({ error });
+            Promise.all(deleteImageS3(image.file_name), deleteImageDB(image._id))
+                .then(data => {
+                    res.json({ data });
+                })
+                .catch(error => {
+                    res.status(500).json({ error });
+                });
+        });
+    });
+
+function deleteImageS3(key) {
+    return new Promise((resolve, reject) => {
+        const s3Params = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: key
+        };
+        s3.deleteObject(s3Params, function(error, data) {
+            if (err) reject(error);
+            resolve(data);
+        });
+    });
+}
+
+function deleteImageDB(id) {
+    return new Promise((resove, reject) => {
+        Image.findByIdAndRemove(id, (error, image) => {
+            if (error) reject(error);
+            resovle(image);
+        });
+    });
+}
 
 module.exports = image;
