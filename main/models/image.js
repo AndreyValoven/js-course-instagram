@@ -7,6 +7,10 @@ const image = mongoose.Schema({
         type: String,
         unique: true
     },
+    file_name: {
+        type: String,
+        unique: true
+    },
     date: String,
     likes: [
         mongoose.Schema.Types.ObjectId,
