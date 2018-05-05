@@ -89,11 +89,13 @@ image.delete('/:id', varyfiToken,
         Image.findById(id, (error, image) => {
             if (error) return res.status(500).json({ error });
             if ( image == null ) return res.status(404).json({ message: 'not found'});
-            Promise.all(deleteImageS3(image.file_name), deleteImageDB(image._id))
+            Promise.all([deleteImageS3(image.file_name), deleteImageDB(image._id)])
                 .then(data => {
-                    res.json({ data });
+                    console.log(data);
+                    res.json({ status: 'ok' });
                 })
                 .catch(error => {
+                    console.log(error);
                     res.status(500).json({ error });
                 });
         });
