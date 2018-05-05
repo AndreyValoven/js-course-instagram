@@ -79,7 +79,7 @@ image.post('/upload', varyfiToken,
     }
 );
 
-// need to test
+
 image.delete('/:id', varyfiToken,
     (req, res)=>{
         if (typeof(req.id) === 'undefined') {
