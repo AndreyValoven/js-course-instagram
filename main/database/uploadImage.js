@@ -6,6 +6,7 @@ module.exports = function(body) {
         _id: mongoose.Types.ObjectId(),
         user_id: body.userId,
         url: body.url,
+        file_name: body.file_name,
         date: Date.now(),
         likes: [],
         tags: []

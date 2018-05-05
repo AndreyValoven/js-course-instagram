@@ -15,8 +15,8 @@ image.get('/:id', varyfiToken,
         const id = req.params.id;
         Image.findById(id, (error, image) => {
             if (error) return res.status(500).json({ error });
-            User.findById(image.user_id, (err, user) => {
-                if (err) return res.json({ error: err});
+            User.findById(image.user_id, (error, user) => {
+                if (error) return res.status(500).json({ error });
                 res.json({
                     user_id: image.user_id,
                     nick_name: user.nick_name,
@@ -25,28 +25,29 @@ image.get('/:id', varyfiToken,
                     date: image.date,
                     tags: image.tags,
                     your_like: false,
-                    likes: image.likes.legth
+                    likes: image.likes
                 });
             });
         });
     });
 
-image.delete('/:id', varyfiToken, (req, res) => {
-    if (typeof(req.id) === 'undefined') {
-        return res.status(403).json({ erorr: 'Forbidden'});
-    }
-    let id = req.params.id;
-    Image.findById(id, (error, image) => {
-        if (error) return res.status(500).json({ error });
-        if (req.id + '' !== image.user_id + '') return res.status(403).jons({ erorr: 'Forbidden' });
+// image.delete('/:id', varyfiToken, (req, res) => {
+//     if (typeof(req.id) === 'undefined') {
+//         return res.status(403).json({ erorr: 'Forbidden'});
+//     }
+//     let id = req.params.id;
+//     Image.findById(id, (error, image) => {
+//         if (error) return res.status(500).json({ error });
+//         if (req.id + '' !== image.user_id + '') return res.status(403).jons({ erorr: 'Forbidden' });
 
-    });
-});
+//     });
+// });
 
 
 image.post('/upload', varyfiToken,
     (req, res) => {
         if (typeof(req.id) === 'undefined') {
+            console.log(req.id);
             return res.status(403).json({ erorr: 'Forbidden'});
         }
         upload(req, res, (error) => {
@@ -68,8 +69,9 @@ image.post('/upload', varyfiToken,
                     return res.status(500).json({ err });
                 }
                 saveImage({
-                    url: "https://s3.amazonaws.com/" + s3Params.Bucket + "/" + s3Params.Key,
-                    userId: req.id
+                    url: `https://s3.amazonaws.com/${s3Params.Bucket}/${s3Params.Key}`,
+                    userId: req.id,
+                    file_name: fileName
                 })
                     .then(image => {
                         return res.json({
@@ -95,8 +97,10 @@ image.delete('/:id', varyfiToken,
         if (typeof(req.id) === 'undefined') {
             return res.status(403).json({ erorr: 'Forbidden'});
         }
-        Image.findById(req.params.id, (error, image) => {
+        const id = req.params.id;
+        Image.findById(id, (error, image) => {
             if (error) return res.status(500).json({ error });
+            if ( image == null ) return res.status(404).json({ message: 'not found'});
             Promise.all(deleteImageS3(image.file_name), deleteImageDB(image._id))
                 .then(data => {
                     res.json({ data });
@@ -114,17 +118,17 @@ function deleteImageS3(key) {
             Key: key
         };
         s3.deleteObject(s3Params, function(error, data) {
-            if (err) reject(error);
+            if (error !== null) reject({type: 'S3', error});
             resolve(data);
         });
     });
 }
 
 function deleteImageDB(id) {
-    return new Promise((resove, reject) => {
+    return new Promise((resolve, reject) => {
         Image.findByIdAndRemove(id, (error, image) => {
-            if (error) reject(error);
-            resovle(image);
+            if (error !== null) reject({type: 'db', error});
+            resolve(image);
         });
     });
 }
