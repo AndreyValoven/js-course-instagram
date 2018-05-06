@@ -19,7 +19,7 @@ registration.post('/',
         const body = req.body;
         saveUser(body)
             .then(result => {
-                let token = jwt.sign({ user: {id: result._id, nick_name: result.nick_name} ,}, process.env.SECRET_KEY);
+                let token = jwt.sign({id: result._id, nick_name: result.nick_name}, process.env.SECRET_KEY);
                 res.type('json');
                 res.status(200).json({
                     token,
