@@ -3,6 +3,7 @@ const user = require('express').Router();
 const varyfiToken = require('./../../functions/verify_token');
 const checkValues = require('./../../functions/check_values');
 const User = require('./../../models/user');
+const Image = require('./../../models/image');
 // const upload = require('./../../image_config/multer');
 // const s3 = require('./../../image_config/s3');
 
@@ -137,6 +138,23 @@ user.patch('/:id', varyfiToken,
                 });
             });
     });
+
+//need to test todo
+user.get('/images/:id', (req, res) => {
+    let id = req.params.id;
+    Image.find({
+        user_id: id
+    }, (error, images) => {
+        if (error) return res.status(500).json({ error });
+        images = images.map(item => {
+            return {
+                id: item._id,
+                url: item.url
+            };
+        });
+        res.json({images});
+    });
+});
 
 
 // user.post('/:id/avatar', varyfiToken, (req, res) => {
