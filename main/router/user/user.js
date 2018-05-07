@@ -1,11 +1,12 @@
 const user = require('express').Router();
+const sharp = require('sharp');
 
 const varyfiToken = require('./../../functions/verify_token');
 const checkValues = require('./../../functions/check_values');
 const User = require('./../../models/user');
 const Image = require('./../../models/image');
-// const upload = require('./../../image_config/multer');
-// const s3 = require('./../../image_config/s3');
+const upload = require('./../../image_config/upload');
+const s3 = require('./../../image_config/s3');
 
 user.use('/:id/following', require('./following'));
 
@@ -157,95 +158,94 @@ user.get('/images/:id', (req, res) => {
 });
 
 
-// user.post('/:id/avatar', varyfiToken, (req, res) => {
-//     let url = req.originalUrl.split('/');
-//     const id = url[3];
-//     if (typeof(req.id) === 'undefined' || req.id + '' === id+ '') {
-//         return res.status(403).json({ erorr: 'Forbidden'});
-//     }
-//     User.findById(id, (error, user) => {
-//         if (error) return res.status(500).json({ error });
-//         uploadAvatar(user.avatar, req, res);
-//     });
-// });
+user.post('/avatar', varyfiToken, (req, res) => {
+    if (typeof(req.id) === 'undefined') {
+        return res.status(403).json({ erorr: 'Forbidden'});
+    }
+    User.findById(req.id, (error, user) => {
+        if (error) return res.status(500).json({ error });
+        if (user.avatar !== '' ) {
+            Promise.all([deleteImageS3(user.avatar), uploadAvatar(req, res)])
+                .then(data => {
+                    console.log(data);
+                    User.findById(req.id, (error, user) => {
+                        if (error) return res.status(500).json({ error });
+                        res.json({ user });
+                    });
+                })
+                .catch(error => {
+                    res.status(500).json({ error });
+                });
+        } else {
+            uploadAvatar(req, res)
+                .then(user => {
+                    res.json({ user });
+                })
+                .catch(error => {
+                    res.status(500).json({ type: 'some', error });
+                });
+        }
+    });
+});
 
-// function uploadAvatar(avatart, req, res) {
-//     if(avatar !== '') {
-//         upload(req, res, (error) => {
-//             if(error) return res.status(500).json({ error });
-//             sharp(req.file.buffer)
-//                 .rotate()
-//                 .resize(350)
-//                 .toBuffer()
-//                 .then( image => {
-//                     const s3Params = {
-//                         Bucket: process.env.BUCKET_NAME,
-//                         Body: image,
-//                         Key: avatar,
-//                         ContentType: req.file.mimetype,
-//                         ALC: 'public-read'
-//                     };
 
-//                     s3.putObject(s3Params, (error, data) => {
-//                         if(error) return res.status(500).json({ error });
-//                         User.findByIdAndUpdate(id,
-//                             {
-//                                 $set: {
-//                                     avatar: avatar
-//                                 }
-//                             }, { new: true },
-//                             (error, user) => {
-//                                 if (error) {
-//                                     return res.status(501).json({
-//                                         error
-//                                     });
-//                                 }
-//                                 res.status(202).json({
-//                                     user,
-//                                 });
-//                             }
-//                         );
-//                     });
+function deleteImageS3(key) {
+    return new Promise((resolve, reject) => {
+        const s3Params = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: key
+        };
+        s3.deleteObject(s3Params, function(error, data) {
+            if (error !== null) reject({type: 'S3', error});
+            resolve(data);
+        });
+    });
+}
 
-//                 })
-//                 .catch(error => {
-//                     res.status(500).json({ error });
-//                 });
-//         });
-//     } else {
-//         upload(req, res, (error) => {
-//             if(error) {
-//                 return res.status(500).json({ error });
-//             } else {
-//                 const file = avatar;
-//                 sharp(req.file.buffer)
-//                     .rotate()
-//                     .resize(320, 320)
-//                     .toBuffer()
-//                     .then(image => {
-//                         const s3Params = {
-//                             Bucket: 'js-course-instagram2',
-//                             Body: image,
-//                             Key: file,
-//                             ContentType: req.file.mimetype,
-//                             ACL: 'public-read'
-//                         };
 
-//                         s3.putObject(s3Params, function (err, data) {
-//                             if (!err) {
-//                                 console.log("Object is public at https://s3.amazonaws.com/" +
-//                                 s3Params.Bucket + "/" + s3Params.Key);
-//                             }
-//                             console.log(data);
-//                         });
-//                         console.log(`https://s3.eu-west-2.amazonaws.com/${ s3Params.Bucket }/${ file }`.replace(/ /g, '+'));
-//                     })
-//                     .catch(error => {
-//                         res.status(500).json({ error });
-//                     });
-//             }
-//         });
-//     }
-// }
+
+function uploadAvatar(req, res) {
+    return new Promise((resolve, reject) => {
+        upload(req, res, (error) => {
+            if (error) return reject(error);
+            let fileType = req.file.mimetype.split('/');
+            fileType = fileType[1];
+            let fileName = req.id + '-avatar.' + fileType;
+            sharp(req.file.buffer)
+                .rotate()
+                .resize(350)
+                .toBuffer()
+                .then( image => {
+                    const s3Params = {
+                        Bucket: process.env.BUCKET_NAME,
+                        Body: image,
+                        Key: fileName,
+                        ContentType: req.file.mimetype,
+                        ACL: 'public-read'
+                    };
+
+                    s3.putObject(s3Params, (error, data) => {
+                        if (error) return reject(error);
+                        User.findByIdAndUpdate(req.id,
+                            {
+                                $set: {
+                                    avatar: `https://s3.amazonaws.com/${s3Params.Bucket}/${s3Params.Key}`
+                                }
+                            }, { new: true },
+                            (error, user) => {
+                                if (error) {
+                                    return reject(error);
+                                }
+                                resolve(user);
+                            });
+                        resolve(data);
+                    });
+                })
+                .catch( error => {
+                    reject(error);
+                });
+        });
+    });
+}
 
 module.exports = user;
