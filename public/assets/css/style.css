@@ -1,0 +1,8 @@
+html {
+  background: url("../img/bg.png") no-repeat;
+  background-size: cover;
+  min-height: 100%;
+  box-sizing: border-box;
+  font: 12px/2 Helvetica Neue, Helvetica, Arial, sans-serif; color: #888;
+}
+::-webkit-input-placeholder { color: #bbb; }
