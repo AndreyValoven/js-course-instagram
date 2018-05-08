@@ -1,10 +1,10 @@
 const AWS = require('aws-sdk');
-const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 3000;
 
 AWS.config.update({
     accessKeyId: process.env.ACCESS_KEY_ID,
     secretAccessKey: process.env.SECRET_ACCESS_KEY,
-    endpoint: "http://localhost:" + PORT,
+    // endpoint: "http://localhost:" + PORT,
     region: process.env.REGION
 });
 
