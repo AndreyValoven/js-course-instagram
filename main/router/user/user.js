@@ -188,6 +188,8 @@ user.post('/avatar', varyfiToken, (req, res) => {
 
 function deleteImageS3(key) {
     return new Promise((resolve, reject) => {
+        let url = key.split('/');
+        key = url[url.length - 1];
         const s3Params = {
             Bucket: process.env.BUCKET_NAME,
             Key: key
