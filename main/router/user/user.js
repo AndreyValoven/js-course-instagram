@@ -1,5 +1,6 @@
 const user = require('express').Router();
 const sharp = require('sharp');
+// const util = require('util');
 
 const varyfiToken = require('./../../functions/verify_token');
 const checkValues = require('./../../functions/check_values');
@@ -14,22 +15,20 @@ user.use('/:id/following', require('./following'));
 user.get('/:id/followers', (req, res) => {
     let url = req.originalUrl.split('/');
     const id = url[3];
+    // let findUserById =  util.promisify(User.findById);
     User.findById(id, (error, user) => {
-        User.find( {
-            _id: {
-                $in: user.followers
-            }
-        }, (error, users) => {
-            if (error) return res.status(500).json({ error });
-            users = users.map(item => {
-                return {
-                    id: item._id,
-                    nick_name: item.nick_name,
-                    avatar: item.avatar
-                };
-            });
-            res.json(users);
-        });
+        User.find( { _id: { $in: user.followers } })
+            .then(users => {
+                users = users.map(item => {
+                    return {
+                        id: item._id,
+                        nick_name: item.nick_name,
+                        avatar: item.avatar
+                    };
+                });
+                res.json(users);
+            })
+            .catch(error => res.status(500).json({ error }));
     });
 });
 
